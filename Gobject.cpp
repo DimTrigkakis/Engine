@@ -48,11 +48,11 @@ void Gobject::draw()
 		if (this->tid != -1)
 		{
 			glEnable(GL_TEXTURE_2D);
-			this->draw_function(this->gid, this->tid, this->name);
+			this->draw_function( this);
 			glDisable(GL_TEXTURE_2D);
 		}
 		else
-			this->draw_function(this->gid, this->tid, this->name);
+			this->draw_function( this);
 	}
 	else
 	{
@@ -68,15 +68,16 @@ void Gobject::draw()
 		GLfloat light_location[] = { this->location[0], this->location[1], this->location[2], 1.0 };
 		glLightfv(GL_LIGHT0 + this->lid, GL_POSITION, light_location);
 	}
+
 	glPopMatrix();
 
 }
 
-Gobject::Gobject(Gobject* parent, char* name, int gid, int tid, void(*draw_function)(int gid, int tid, char* name)){
+Gobject::Gobject(Gobject* parent, char* name, int tid, int lid, void(*draw_function)( Gobject *g)){
 	this->parent = parent;
 	this->name = name;
-	this->gid = gid;
 	this->tid = tid;
+	this->lid = lid;
 	this->draw_function = draw_function;
 
 };

@@ -125,6 +125,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BmpTexture.cpp" />
     <ClCompile Include="Gobject.cpp" />
     <ClCompile Include="Core.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
@@ -133,11 +134,20 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="Scenegraph.cpp" />
+    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Source1.cpp" />
+    <ClCompile Include="Spot.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BmpTexture.h" />
+    <ClInclude Include="Core.h" />
     <ClInclude Include="Gobject.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Scenegraph.h" />
+    <ClInclude Include="Source.h" />
+    <ClInclude Include="Spot.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

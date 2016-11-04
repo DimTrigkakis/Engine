@@ -16,6 +16,9 @@
 #include "glut.h"
 
 #include "Scenegraph.h"
+#include "Core.h"
+#include "Source.h"
+#include "BmpTexture.h"
 
 // title of these windows:
 
@@ -64,7 +67,7 @@ enum ButtonVals
 
 // window background color (rgba):
 
-const GLfloat BACKCOLOR[ ] = { 0.1, 0.1, 0.12, 1. };
+const GLfloat BACKCOLOR[ ] = { 0.1f, 0.1f, 0.12f, 1.f };
 
 // the color numbers:
 // this order must match the radio button order
@@ -118,6 +121,12 @@ int		WhichColor;				// index into Colors[ ]
 int		Xmouse, Ymouse;			// mouse values
 float	Xrot, Yrot;				// rotation angles in degrees
 
+// Scenegraph
+
+Scenegraph *scene;
+Source *source;
+
+GLuint mytextures[2] = { 0,0 };
 
 // function prototypes:
 
@@ -141,19 +150,22 @@ void	HsvRgb( float[3], float [3] );
 // main program:
 
 int
-main( int argc, char *argv[ ] )
+main(int argc, char *argv[])
 {
+
 	// turn on the glut package:
 	// (do this before checking argc and argv since it might
 	// pull some command line arguments out)
 
-	glutInit( &argc, argv );
+	glutInit(&argc,argv);
 
 
 	// setup all the graphics stuff:
 
 	InitGraphics( );
 
+	scene = new Scenegraph();
+	source = new Source(scene);
 
 	// create the display structures that will not change:
 
@@ -170,13 +182,17 @@ main( int argc, char *argv[ ] )
 
 	InitMenus( );
 
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+
+	//glutCreateWindow("Texture Mapping - Programming Techniques");
+
+	glutDisplayFunc(Display);
 
 	// draw the scene once and wait for some interaction:
 	// (this will never return)
 
 	glutSetWindow( MainWindow );
 	glutMainLoop( );
-
 
 	// this is here to make the compiler happy:
 
@@ -192,10 +208,12 @@ main( int argc, char *argv[ ] )
 // do not call Display( ) from here -- let glutMainLoop( ) do it
 
 void
-Animate( )
+Animate( float timeval)
 {
 	// put animation stuff in here -- change some global variables
 	// for Display( ) to find:
+
+	source->Animate(timeval);
 
 	// force a call to Display( ) next time it is convenient:
 
@@ -203,12 +221,13 @@ Animate( )
 	glutPostRedisplay( );
 }
 
-
 // draw the complete scene:
 
 void
 Display( )
 {
+
+	
 	if( DebugOn != 0 )
 	{
 		fprintf( stderr, "Display\n" );
@@ -223,11 +242,6 @@ Display( )
 	glDrawBuffer( GL_BACK );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glEnable( GL_DEPTH_TEST );
-
-	// specify shading to be flat:
-
-	glShadeModel( GL_FLAT );
-
 
 	// set the viewport to a square centered in the window:
 
@@ -246,7 +260,7 @@ Display( )
 
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity( );
-	gluPerspective( 90., 1.,	0.1, 1000. );
+	gluPerspective( 40., 1.,	0.1, 1000. );
 
 
 	// place the objects into the scene:
@@ -273,46 +287,45 @@ Display( )
 	glScalef( (GLfloat)Scale, (GLfloat)Scale, (GLfloat)Scale );
 
 	// since we are using glScalef( ), be sure normals get unitized:
-
+	
 	glEnable( GL_NORMALIZE );
 
-	// draw some gratuitous text that just rotates on top of the scene:
-
-	glDisable( GL_DEPTH_TEST );
-	glColor3f( 0., 1., 1. );
-
-
-	// draw some gratuitous text that is fixed on the screen:
-	//
-	// the projection matrix is reset to define a scene whose
-	// world coordinate system goes from 0-100 in each axis
-	//
-	// this is called "percent units", and is just a convenience
-	//
-	// the modelview matrix is reset to identity as we don't
-	// want to transform these coordinates
-
-	glDisable( GL_DEPTH_TEST );
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity( );
-	gluOrtho2D( 0., 100.,     0., 100. );
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity( );
-	glColor3f( 1., 1., 1. );
-
-	Scenegraph scene;
-	scene.draw();
-
-	// swap the double-buffered framebuffers:
+	scene->draw();
 
 	glutSwapBuffers( );
-
 
 	// be sure the graphics buffer has been sent:
 	// note: be sure to use glFlush( ) here, not glFinish( ) !
 
 	glFlush( );
 }
+
+void
+SetTexture(int texture_index)
+{
+	glBindTexture(GL_TEXTURE_2D, mytextures[texture_index]);
+}
+
+void
+LoadTexture(char* path,int i)
+{
+	int ix, iy;
+
+	glClearColor(0.1, 0.1, 0.15, 0.0);
+
+	glEnable(GL_DEPTH_TEST);
+
+	glDepthFunc(GL_LESS);
+
+	unsigned char* image = BmpToTexture(path, &ix, &iy);
+	glGenTextures(1, mytextures);
+	glBindTexture(GL_TEXTURE_2D, mytextures[i]);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, ix, iy, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //scale linearly when image bigger than texture
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); //scale linearly when image smalled than texture
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+};
 
 
 void
@@ -386,7 +399,6 @@ InitGraphics( )
 {
 	// request the display modes:
 	// ask for red-green-blue-alpha color, double-buffering, and z-buffering:
-
 	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
 
 	// set the initial window configuration:
@@ -445,6 +457,10 @@ InitGraphics( )
 	glutTimerFunc( -1, NULL, 0 );
 	glutIdleFunc( Idle );
 
+	// Enable the lighting model
+
+	glEnable(GL_LIGHTING);
+
 	// init glew (a window must be open to do this):
 
 #ifdef WIN32
@@ -481,17 +497,13 @@ Keyboard( unsigned char c, int x, int y )
 
 	switch( c )
 	{
-		/*
 		case 'o':
 		case 'O':
-			WhichProjection = ORTHO;
 			break;
 
 		case 'p':
 		case 'P':
-			WhichProjection = PERSP;
-			break;
-		*/
+			break;		
 
 		default:
 			fprintf( stderr, "Don't know what to do with keyboard hit: '%c' (0x%0x)\n", c, c );
@@ -630,9 +642,30 @@ Visibility ( int state )
 	}
 }
 
+double timepassA = glutGet(GLUT_ELAPSED_TIME);
+double timepassB = glutGet(GLUT_ELAPSED_TIME);
+
+bool flip = false;
+
 void
 Idle()
 {
+	float timediff = 0;
+	if (flip)
+	{
+		timepassA = glutGet(GLUT_ELAPSED_TIME);
+		timediff = timepassA - timepassB;
+		flip = false;
+	}
+	else
+	{
+		timepassB = glutGet(GLUT_ELAPSED_TIME);
+		timediff = timepassB - timepassA;
+		flip = true;
+	}
+
+	Animate(timediff);
+
 	glutPostRedisplay();
 };
 

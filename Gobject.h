@@ -5,7 +5,6 @@
 
 class Gobject {
 public:
-	int gid = 0;
 	int tid = -1;
 	int lid = -1;
 	char* name;
@@ -16,7 +15,7 @@ public:
 	void transform();
 
 public:
-	void(*draw_function)(int gid, int tid, char* name) = NULL;
+	void(*draw_function)(Gobject *g) = NULL;
 	void draw();
-	Gobject(Gobject* parent, char* name, int gid, int tid, void(*draw_function)(int gid, int tid, char* name));
+	Gobject(Gobject* parent, char* name, int tid, int lid, void(*draw_function)(Gobject *g));
 };
