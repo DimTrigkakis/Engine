@@ -57,14 +57,6 @@ enum Projections
 	PERSP
 };
 
-// which button:
-
-enum ButtonVals
-{
-	RESET,
-	QUIT
-};
-
 // window background color (rgba):
 
 const GLfloat BACKCOLOR[ ] = { 0.1f, 0.1f, 0.12f, 1.f };
@@ -160,6 +152,7 @@ main(int argc, char *argv[])
 	glutInit(&argc,argv);
 
 
+
 	// setup all the graphics stuff:
 
 	InitGraphics( );
@@ -177,12 +170,12 @@ main(int argc, char *argv[])
 
 	Reset( );
 
-
 	// setup all the user interface stuff:
 
 	InitMenus( );
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+
 
 	//glutCreateWindow("Texture Mapping - Programming Techniques");
 
@@ -192,6 +185,9 @@ main(int argc, char *argv[])
 	// (this will never return)
 
 	glutSetWindow( MainWindow );
+
+
+
 	glutMainLoop( );
 
 	// this is here to make the compiler happy:
@@ -208,7 +204,7 @@ main(int argc, char *argv[])
 // do not call Display( ) from here -- let glutMainLoop( ) do it
 
 void
-Animate( float timeval)
+Animate( int timeval)
 {
 	// put animation stuff in here -- change some global variables
 	// for Display( ) to find:
@@ -271,7 +267,7 @@ Display( )
 
 	// set the eye position, look-at position, and up-vector:
 
-	gluLookAt( 0., 0., 3.,     0., 0., 0.,     0., 1., 0. );
+	gluLookAt( 0., 0., 5.,     0., 0., 0.,     0., 1., 0. );
 
 
 	// rotate the scene:
@@ -311,10 +307,7 @@ LoadTexture(char* path,int i)
 {
 	int ix, iy;
 
-	glClearColor(0.1, 0.1, 0.15, 0.0);
-
 	glEnable(GL_DEPTH_TEST);
-
 	glDepthFunc(GL_LESS);
 
 	unsigned char* image = BmpToTexture(path, &ix, &iy);
@@ -401,6 +394,8 @@ InitGraphics( )
 	// ask for red-green-blue-alpha color, double-buffering, and z-buffering:
 	glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
 
+
+
 	// set the initial window configuration:
 
 	glutInitWindowPosition(glutGet(GLUT_SCREEN_WIDTH) / 2 - 400, glutGet(GLUT_SCREEN_HEIGHT) / 2 - 400);
@@ -411,9 +406,19 @@ InitGraphics( )
 	MainWindow = glutCreateWindow( WINDOWTITLE );
 	glutSetWindowTitle( WINDOWTITLE );
 
+
+	// Enable face culling
+
+	glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
 	// set the framebuffer clear values:
 
 	glClearColor( BACKCOLOR[0], BACKCOLOR[1], BACKCOLOR[2], BACKCOLOR[3] );
+
+
+
 
 	// setup the callback functions:
 	// DisplayFunc -- redraw the window
@@ -460,11 +465,13 @@ InitGraphics( )
 	// Enable the lighting model
 
 	glEnable(GL_LIGHTING);
-
 	// init glew (a window must be open to do this):
 
 #ifdef WIN32
+
+	glewExperimental = GL_TRUE;
 	GLenum err = glewInit( );
+
 	if( err != GLEW_OK )
 	{
 		fprintf( stderr, "glewInit Error\n" );
@@ -642,15 +649,15 @@ Visibility ( int state )
 	}
 }
 
-double timepassA = glutGet(GLUT_ELAPSED_TIME);
-double timepassB = glutGet(GLUT_ELAPSED_TIME);
+int timepassA = glutGet(GLUT_ELAPSED_TIME);
+int timepassB = glutGet(GLUT_ELAPSED_TIME);
 
 bool flip = false;
 
 void
 Idle()
 {
-	float timediff = 0;
+	int timediff = 0;
 	if (flip)
 	{
 		timepassA = glutGet(GLUT_ELAPSED_TIME);

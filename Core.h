@@ -19,7 +19,14 @@ extern int		WhichColor;				// index into Colors[ ]
 extern int		Xmouse, Ymouse;			// mouse values
 extern float	Xrot, Yrot;				// rotation angles in degrees
 
+extern enum ButtonVals
+{
+	RESET,
+	QUIT
+};
+
 extern Scenegraph *scene;
 extern void SetTexture(int);
 extern void LoadTexture(char*,int);
 extern GLuint mytextures[2];
+extern void	DoMainMenu(int);

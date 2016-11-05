@@ -1,0 +1,5 @@
+
+0(9) : error C0000: syntax error, unexpected '?', expecting "::" at token "?"
+0(10) : error C0000: syntax error, unexpected '?', expecting "::" at token "?"
+0(14) : error C0000: syntax error, unexpected '=', expecting "::" at token "="
+
