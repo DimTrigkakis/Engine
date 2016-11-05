@@ -123,7 +123,7 @@ void draw(Gobject *g)
 	if (g->tid != -1)
 		SetTexture(g->tid);
 
-	glDisable(GL_LIGHTING);
+	//glDisable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 
 	GLfloat ad[] = { 50.0f / 256.0f, 20.0f / 256.0f, 20.0f / 256.0f, 1.0f };

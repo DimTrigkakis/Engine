@@ -12,8 +12,12 @@ main( )
 { 
 	vST = gl_MultiTexCoord0.st;
 	vec3 vert = gl_Vertex.xyz;
-	vert.x = vert.x+vert.y;
-	vert.y = vert.y* (int(uTime) % 1000)/1000.0f;
-	vert.z = vert.z+vert.x;
+	vert.x = vert.x+0.1*vert.y;
+	int a = int(uTime) % 1000;
+	int b = a;
+	if (a > 500)
+		b = 1000 - a;
+	vert.y = 0.1*vert.y+0.9* vert.y* (b)/1000.0f;
+	vert.z = vert.z;
 	gl_Position = gl_ModelViewProjectionMatrix * vec4( vert, 1. );
 }
