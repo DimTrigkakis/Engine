@@ -23,7 +23,7 @@
 
 #include "glslprogram.h"
 GLSLProgram	*Pattern;
-float		 Time;
+float		 Time = 0;
 
 
 
@@ -89,6 +89,7 @@ Source::Init()
 {
 	// Shader compilation
 
+
 	Pattern = new GLSLProgram();
 	bool valid = Pattern->Create("pattern.vert", "pattern.frag");
 	if (!valid)
@@ -102,7 +103,7 @@ Source::Init()
 	Pattern->SetVerbose(false);
 
 	// Current Vertex Array Object
-	
+
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(GLfloat) * 8 * 2, CubeVertices, GL_STATIC_DRAW);
@@ -110,18 +111,19 @@ Source::Init()
 
 	glGenBuffers(1, &indicebuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indicebuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 6 * 4,	CubeIndices, GL_STATIC_DRAW);
-
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 6 * 4, CubeIndices, GL_STATIC_DRAW);
 }
-
 
 void draw(Gobject *g)
 {
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	if (g->tid != -1)
 		SetTexture(g->tid);
 
-	//glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 
 	GLfloat ad[] = { 50.0f / 256.0f, 20.0f / 256.0f, 20.0f / 256.0f, 1.0f };
@@ -147,13 +149,18 @@ void draw(Gobject *g)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	Pattern->Use();
+	Pattern->SetUniformVariable("uTime", Time);
+
 	glFrontFace(GL_CW);
-	glutSolidTeapot(1.0);
+	glutSolidTeapot(5.0);
 	glFrontFace(GL_CCW);
 
+	Pattern->Use(0);
 }
-
 void Source::Animate(int timeval) {
+	Time += timeval*0.1f;
 	Yrot += 1.0f;
 	//this->scene->g[0]->rotation[1] += timeval*0.1f;
 }

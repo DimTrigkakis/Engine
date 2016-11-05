@@ -267,7 +267,7 @@ Display( )
 
 	// set the eye position, look-at position, and up-vector:
 
-	gluLookAt( 0., 0., 5.,     0., 0., 0.,     0., 1., 0. );
+	gluLookAt( 0., 0., 20,     0., 0., 0.,     0., 1., 0. );
 
 
 	// rotate the scene:
@@ -409,8 +409,9 @@ InitGraphics( )
 
 	// Enable face culling
 
+	
 	glFrontFace(GL_CCW);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
 	// set the framebuffer clear values:
